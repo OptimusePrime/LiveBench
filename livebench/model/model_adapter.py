@@ -131,7 +131,7 @@ NVIDIA_MODEL_LIST = (
 )
 
 REFLECTION_MODEL_LIST = (
-    "reflection-llama-3.1-70b"
+    "mattshumer/Reflection-Llama-3.1-70B"
 )
 
 class BaseModelAdapter:
