@@ -130,6 +130,10 @@ NVIDIA_MODEL_LIST = (
     "nemotron-4-340b-instruct",
 )
 
+REFLECTION_MODEL_LIST = (
+    "reflection-llama-3.1-70b"
+)
+
 class BaseModelAdapter:
     """The base and the default model adapter."""
 
@@ -2420,7 +2424,7 @@ class CohereAdapter(BaseModelAdapter):
 
     def match(self, model_path: str):
         return "command" in model_path.lower()
-    
+
     def load_model(self, model_path: str, from_pretrained_kwargs: dict):
         raise NotImplementedError()
 

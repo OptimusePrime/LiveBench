@@ -33,12 +33,13 @@ from livebench.common import (
     LIVE_BENCH_DATA_SUPER_PATH,
 )
 from livebench.model.model_adapter import (
-    get_conversation_template, 
+    REFLECTION_MODEL_LIST,
+    get_conversation_template,
     ANTHROPIC_MODEL_LIST,
-    GOOGLE_GENERATIVEAI_MODEL_LIST, 
+    GOOGLE_GENERATIVEAI_MODEL_LIST,
     VERTEX_MODEL_LIST,
-    MISTRAL_MODEL_LIST, 
-    COHERE_MODEL_LIST, 
+    MISTRAL_MODEL_LIST,
+    COHERE_MODEL_LIST,
     DEEPSEEK_MODEL_LIST,
     TOGETHER_MODEL_LIST,
     NVIDIA_MODEL_LIST,
@@ -84,11 +85,15 @@ def get_answer(
             elif model in COHERE_MODEL_LIST:
                 output = chat_completion_cohere(model, conv, temperature, max_tokens)
             elif model in DEEPSEEK_MODEL_LIST:
-                output = chat_completion_deepseek(model, conv, temperature, max_tokens)         
+                output = chat_completion_deepseek(model, conv, temperature, max_tokens)
             elif model in TOGETHER_MODEL_LIST:
-                output = chat_completion_together(model, conv, temperature, max_tokens)        
+                output = chat_completion_together(model, conv, temperature, max_tokens)
             elif model in NVIDIA_MODEL_LIST:
-                output = chat_completion_nvidia(model, conv, temperature, max_tokens)     
+                output = chat_completion_nvidia(model, conv, temperature, max_tokens)
+            elif model in REFLECTION_MODEL_LIST:
+                reflection_output = chat_completion_openai(model, conv, temperature, max_tokens)
+                pattern = r"<output>\s*([\s\S]*?)\s*</output>"
+                output = re.search(pattern, reflection_output).group(1)
             else:
                 output = chat_completion_openai(model, conv, temperature, max_tokens)
 
@@ -138,7 +143,7 @@ def run_questions(parallel, questions, model, num_choices, max_tokens, answer_fi
                     answer_file,
                     api_dict=api_dict,
                 )
-                futures.append(future)      
+                futures.append(future)
 
             for future in tqdm.tqdm(
                 concurrent.futures.as_completed(futures), total=len(futures)
@@ -227,11 +232,11 @@ if __name__ == "__main__":
 
                 run_questions(
                     parallel=args.parallel,
-                    questions=questions, 
-                    model=args.model, 
+                    questions=questions,
+                    model=args.model,
                     num_choices=args.num_choices,
-                    max_tokens=args.max_tokens, 
-                    answer_file=answer_file, 
+                    max_tokens=args.max_tokens,
+                    answer_file=answer_file,
                     api_dict=api_dict
                 )
 
@@ -254,14 +259,13 @@ if __name__ == "__main__":
 
             run_questions(
                 parallel=args.parallel,
-                questions=questions, 
-                model=args.model, 
+                questions=questions,
+                model=args.model,
                 num_choices=args.num_choices,
-                max_tokens=args.max_tokens, 
-                answer_file=answer_file, 
+                max_tokens=args.max_tokens,
+                answer_file=answer_file,
                 api_dict=api_dict
             )
 
     else:
         raise ValueError(f"Bad question source {args.question_source}.")
-    
